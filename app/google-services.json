@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "673433260245",
+    "project_id": "techpeach",
+    "storage_bucket": "techpeach.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673433260245:android:5cf565ad6d792e9dec125c",
+        "android_client_info": {
+          "package_name": "com.cp.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhRUmCFt_xtOqDDnyQm4VzxcWHgpUYsVQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
