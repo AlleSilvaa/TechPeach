@@ -1,18 +1,18 @@
-package com.cp.myapplication.network
+package com.cp.planejeja.network
 
-import retrofit2.Call
 import retrofit2.http.*
+import retrofit2.Response
 
 interface ApiService {
     @GET("itinerarios")
-    fun getItinerarios(): Call<List<Itinerario>>
+    suspend fun getItinerarios(): List<Itinerario>
 
     @POST("itinerarios")
-    fun createItinerario(@Body itinerario: Itinerario): Call<Itinerario>
+    suspend fun createItinerario(@Body itinerario: Itinerario): Response<Unit>
 
     @PUT("itinerarios/{id}")
-    fun updateItinerario(@Path("id") id: String, @Body itinerario: Itinerario): Call<Itinerario>
+    suspend fun updateItinerario(@Path("id") id: String, @Body itinerario: Itinerario): Response<Unit>
 
     @DELETE("itinerarios/{id}")
-    fun deleteItinerario(@Path("id") id: String): Call<Void>
+    suspend fun deleteItinerario(@Path("id") id: String): Response<Unit>
 }
