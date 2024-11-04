@@ -1,57 +1,62 @@
-package com.cp.myapplication.myitinerary
+package com.cp.planejeja.myitinerary
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.cp.myapplication.R
-import com.cp.myapplication.network.Itinerario
-import com.cp.myapplication.network.RetrofitClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.cp.planejeja.R
+import com.cp.planejeja.network.RetrofitClient
+import com.cp.planejeja.model.Itinerario
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MyItineraryActivity : AppCompatActivity() {
 
-    private lateinit var recyclerView: RecyclerView
     private lateinit var itineraryAdapter: ItineraryAdapter
-    private val itineraries = mutableListOf<Itinerario>()
+    private lateinit var itineraryList: List<Itinerario>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_my_itinerary) // Verifique se o layout existe e está correto
+        setContentView(R.layout.activity_my_itinerary)
 
-        recyclerView = findViewById(R.id.recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        itineraryAdapter = ItineraryAdapter(itineraries) { itinerary ->
-            // Implementar ação ao clicar no item
-            // Por exemplo, abrir uma nova atividade com detalhes
+        // Configura RecyclerView
+        val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
+        itineraryAdapter = ItineraryAdapter(itineraryList) { itinerary ->
+            openEditItinerary(itinerary)
         }
-
+        recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = itineraryAdapter
+
+        // Botão para adicionar novo itinerário
+        findViewById<Button>(R.id.buttonAdd).setOnClickListener {
+            openCreateItinerary()
+        }
 
         loadItineraries()
     }
 
     private fun loadItineraries() {
-        val call: Call<List<Itinerario>> = RetrofitClient.apiService.getItinerarios()
-        call.enqueue(object : Callback<List<Itinerario>> {
-            override fun onResponse(call: Call<List<Itinerario>>, response: Response<List<Itinerario>>) {
-                if (response.isSuccessful) {
-                    val itinerariesFromApi = response.body() ?: emptyList()
-                    itineraries.clear()
-                    itineraries.addAll(itinerariesFromApi)
-                    itineraryAdapter.notifyDataSetChanged()
-                } else {
-                    Log.e("ApiService", "Erro na resposta: ${response.code()}")
-                }
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = RetrofitClient.apiService.getItinerarios()
+            withContext(Dispatchers.Main) {
+                itineraryList = response
+                itineraryAdapter.updateList(itineraryList) // Atualiza a lista no adapter
             }
+        }
+    }
 
-            override fun onFailure(call: Call<List<Itinerario>>, t: Throwable) {
-                Log.e("ApiService", "Falha na chamada: ${t.message}")
-            }
-        })
+    private fun openCreateItinerary() {
+        val intent = Intent(this, CreateItineraryActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun openEditItinerary(itinerary: Itinerario) {
+        val intent = Intent(this, EditItineraryActivity::class.java)
+        intent.putExtra("itinerary_id", itinerary.id)
+        startActivity(intent)
     }
 }
